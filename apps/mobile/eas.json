@@ -4,7 +4,7 @@
     "preview": {
       "distribution": "internal",
       "android": { "buildType": "apk" },
-      "env": { "EXPO_PUBLIC_API_URL": "https://APP_URL_FROM_ZEROPS" }
+      "env": { "EXPO_PUBLIC_API_URL": "https://app-3252-8787.prg1.zerops.app" }
     }
   }
 }
