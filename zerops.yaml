@@ -8,19 +8,19 @@ zerops:
         - npx -y pnpm@11.19.0 install --frozen-lockfile --config.node-linker=hoisted
         - npx -y pnpm@11.19.0 build:server
         - cd apps/worker && npm ci --omit=dev --ignore-scripts
-        - mkdir -p bin && curl -fsSL https://download.docker.com/linux/static/stable/x86_64/docker-27.5.1.tgz | tar -xz -C bin --strip-components=1 docker/docker
       deployFiles:
         - ./dist
         - ./node_modules
         - ./package.json
         - ./apps/worker
-        - ./bin
     run:
       base: nodejs@24
       os: ubuntu
       prepareCommands:
         - sudo apt-get update
-        - sudo apt-get install -y rclone
+        - sudo apt-get install -y rclone curl ca-certificates
+        # Docker CLI only (no engine) -> /usr/local/bin is already on the system PATH
+        - curl -fsSL https://download.docker.com/linux/static/stable/x86_64/docker-27.5.1.tgz | sudo tar -xz -C /usr/local/bin --strip-components=1 docker/docker
         - sudo mkdir -p /opt/ms-playwright
         - sudo chmod 777 /opt/ms-playwright
         - sudo env "PATH=$PATH" npx -y playwright@1.62.1 install-deps chromium
@@ -30,13 +30,13 @@ zerops:
         mountPath: /mnt/vol
       envVariables:
         NODE_ENV: production
-        PATH: /var/www/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
         # API
         HOST: 0.0.0.0
         PORT: "8787"
         WORKSPACE_MODE: live
         AGENT_BACKEND: model
-        MODEL: openai/gpt-5
+        # Model: OPENAI_BASE_URL + OPENAI_API_KEY are secrets on the service
+        MODEL: ag/gemini-3.8-flash         # keep the openai/ prefix, e.g. openai/vendor/model-name
         DATA_DIR: /mnt/vol/openmuse
         TASK_WORKER_ENABLED: "true"
         BROWSER_WORKER_URL: http://127.0.0.1:8790
