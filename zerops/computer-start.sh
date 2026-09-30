@@ -17,8 +17,14 @@ dec "$DOCKER_CLIENT_KEY_B64"  "$CERTS/client/key.pem"
 chmod 600 "$CERTS"/*/*.pem
 echo "[computer] certs written to $CERTS"
 
-# 1) Build the computer image on the VM's own engine (has internet)
+# Helper: run docker against the INNER engine (TLS). Plain `docker` = outer VM engine.
+inner() {
+  DOCKER_HOST=tcp://127.0.0.1:2376 DOCKER_TLS_VERIFY=1 DOCKER_CERT_PATH="$CERTS/client" docker "$@"
+}
+
+# 1) Build the computer image on the OUTER engine (has internet)
 docker build -t openmuse-computer:local ./apps/computer
+echo "[computer] image built on outer engine"
 
 # 2) Inner Docker engine that only accepts clients with your certificate
 docker rm -f omdind >/dev/null 2>&1 || true
@@ -32,11 +38,20 @@ docker run -d --name omdind --privileged --network=host --restart unless-stopped
   --bridge=none --iptables=false
 echo "[computer] inner engine started"
 
-# 3) Wait, then copy the image into the inner engine
-export DOCKER_HOST=tcp://127.0.0.1:2376 DOCKER_TLS_VERIFY=1 DOCKER_CERT_PATH="$CERTS/client"
-i=0; until docker version >/dev/null 2>&1; do i=$((i+1)); [ "$i" -ge 60 ] && { echo "[computer] inner engine not reachable"; docker logs --tail 50 omdind || true; exit 1; }; sleep 2; done
-docker save openmuse-computer:local | docker load
-unset DOCKER_HOST DOCKER_TLS_VERIFY DOCKER_CERT_PATH
-echo "[computer] ready on :2376"
+# 3) Wait for the inner engine
+i=0
+until inner version >/dev/null 2>&1; do
+  i=$((i+1))
+  if [ "$i" -ge 60 ]; then
+    echo "[computer] inner engine not reachable"; docker logs --tail 50 omdind || true; exit 1
+  fi
+  sleep 2
+done
+echo "[computer] inner engine reachable"
+
+# 4) Copy image: save from OUTER, load into INNER
+docker save openmuse-computer:local | inner load
+inner image inspect openmuse-computer:local >/dev/null
+echo "[computer] ready on :2376 (image loaded)"
 
 exec docker logs -f omdind
