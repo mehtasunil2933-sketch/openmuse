@@ -36,7 +36,7 @@ zerops:
         WORKSPACE_MODE: live
         AGENT_BACKEND: model
         # Model: OPENAI_BASE_URL + OPENAI_API_KEY are secrets on the service
-        MODEL: ag/gemini-3.8-flash         # keep the openai/ prefix, e.g. openai/vendor/model-name
+        MODEL: openai/ag/gemini-3.8-flash       # keep the openai/ prefix, e.g. openai/vendor/model-name
         DATA_DIR: /mnt/vol/openmuse
         TASK_WORKER_ENABLED: "true"
         BROWSER_WORKER_URL: http://127.0.0.1:8790
