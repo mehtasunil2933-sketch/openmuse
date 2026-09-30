@@ -35,8 +35,10 @@ zerops:
         PORT: "8787"
         WORKSPACE_MODE: live
         AGENT_BACKEND: model
-        # Model: OPENAI_BASE_URL + OPENAI_API_KEY are secrets on the service
-        MODEL: openai/ag/gemini-3.8-flash       # keep the openai/ prefix, e.g. openai/vendor/model-name
+        # Model: OPENAI_BASE_URL + OPENAI_API_KEY are secrets on the service.
+        # "openai/" selects the OpenAI-compatible client; the rest is sent to your gateway as-is.
+        MODEL: openai/ag/gemini-3.8-flash
+        PUBLIC_API_URL: https://app-3252-8787.prg1.zerops.app
         DATA_DIR: /mnt/vol/openmuse
         TASK_WORKER_ENABLED: "true"
         BROWSER_WORKER_URL: http://127.0.0.1:8790
@@ -46,8 +48,6 @@ zerops:
         DOCKER_HOST: tcp://computer:2376
         DOCKER_TLS_VERIFY: "1"
         DOCKER_CERT_PATH: /mnt/vol/certs
-        # Uncomment after the first deploy with your real URL:
-        # PUBLIC_API_URL: https://APP_URL_FROM_ZEROPS
         # Browser worker (same container, loopback only)
         WORKER_HOST: 127.0.0.1
         WORKER_DATA_DIR: /mnt/vol/browser
