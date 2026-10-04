@@ -13,6 +13,8 @@ zerops:
         - ./node_modules
         - ./package.json
         - ./apps/worker
+        # files.py is uploaded into the E2B desktop on Start (read from apps/computer/files.py)
+        - ./apps/computer/files.py
     run:
       base: nodejs@24
       os: ubuntu
