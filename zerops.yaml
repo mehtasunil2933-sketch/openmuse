@@ -90,6 +90,23 @@ zerops:
           timing: "45 3 * * *"
           allContainers: false
 
+  # ---------- Web app (Expo web export), static files ----------
+  - setup: web
+    build:
+      base: nodejs@24
+      os: ubuntu
+      envVariables:
+        # Baked into the bundle at build time (same as the APK)
+        EXPO_PUBLIC_API_URL: https://app-3252-8787.prg1.zerops.app
+      buildCommands:
+        - npx -y pnpm@11.19.0 install --frozen-lockfile --config.node-linker=hoisted
+        - npx -y pnpm@11.19.0 --dir apps/mobile exec expo export --platform web --output-dir dist/web --clear
+      deployFiles:
+        # "~" deploys the folder's contents, so index.html lands at the web root
+        - ./apps/mobile/dist/web/~
+    run:
+      base: alpine/static
+
   # ---------- Linux computer, fixed tiny Docker VM (fallback when COMPUTER_PROVIDER=docker) ----------
   - setup: computer
     build:
