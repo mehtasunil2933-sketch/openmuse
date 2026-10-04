@@ -37,13 +37,14 @@ zerops:
         AGENT_BACKEND: model
         # Model via your gateway's Anthropic Messages API.
         # ANTHROPIC_BASE_URL + ANTHROPIC_API_KEY are secrets on the service.
-        # "anthropic/" selects the Anthropic client; "ag/gemini-3.8-flash" is sent to the gateway as-is.
         MODEL: anthropic/ag/gemini-3.8-flash
         PUBLIC_API_URL: https://app-3252-8787.prg1.zerops.app
         DATA_DIR: /mnt/vol/openmuse
         TASK_WORKER_ENABLED: "true"
         BROWSER_WORKER_URL: http://127.0.0.1:8790
+        # Agent computer: e2b-desktop (needs secret E2B_API_KEY) or docker (uses the "computer" service)
         COMPUTER_ENABLED: "true"
+        COMPUTER_PROVIDER: e2b-desktop
         COMPUTER_IMAGE: openmuse-computer:local
         COMPUTER_DEPLOYMENT_ID: openmuse
         DOCKER_HOST: tcp://computer:2376
@@ -87,7 +88,7 @@ zerops:
           timing: "45 3 * * *"
           allContainers: false
 
-  # ---------- Linux computer, fixed tiny Docker VM ----------
+  # ---------- Linux computer, fixed tiny Docker VM (fallback when COMPUTER_PROVIDER=docker) ----------
   - setup: computer
     build:
       base: ubuntu@22.04
