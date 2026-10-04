@@ -41,6 +41,8 @@ zerops:
         # ANTHROPIC_BASE_URL + ANTHROPIC_API_KEY are secrets on the service.
         MODEL: anthropic/ag/gemini-3.8-flash
         PUBLIC_API_URL: https://app-3252-8787.prg1.zerops.app
+        # Web app origin (exact match, no trailing slash); comma-separate to add more
+        ALLOWED_ORIGINS: https://web-3252.prg1.zerops.app
         DATA_DIR: /mnt/vol/openmuse
         TASK_WORKER_ENABLED: "true"
         BROWSER_WORKER_URL: http://127.0.0.1:8790
